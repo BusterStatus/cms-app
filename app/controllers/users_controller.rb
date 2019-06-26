@@ -13,13 +13,13 @@ class UsersController < ApplicationController
     end
 
     post '/signup' do
-        if params[:password] == params[:confirm_password]
+        # if params[:password] == params[:confirm_password]
             user = User.create(name: params[:name], email: params[:email], password: params[:password], password_confirmation: params[:confirm_password])
             session[:user_id] = user.id
             redirect to '/amiibos'
-        else
-            erb :'/users/signup'
-        end
+        # else
+        #     erb :'/users/signup'
+        # end
     end
 
     get '/login' do
@@ -32,8 +32,7 @@ class UsersController < ApplicationController
     
     post '/login' do
         user = User.find_by(:email => params[:email])
- 
-        if User.find_by(:email => params[:email]).try(:authenticate, params[:password]) 
+        if user.try(:authenticate, params[:password]) 
             session.clear
             session[:user_id] = user.id
             redirect "/amiibos"
@@ -42,14 +41,8 @@ class UsersController < ApplicationController
         end
     end
 
-    get '/logout' do
-        session.clear
-        redirect '/login'
-    end
-
     post '/logout' do
-        user = User.find_by(id: session[:user_id])
-        if !user.nil?
+        if logged_in?
             session.clear
             redirect to '/login'
         else

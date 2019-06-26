@@ -1,7 +1,11 @@
 class AmiibosController < ApplicationController
 
     get '/amiibos' do
-        erb :'/amiibos/amiibos'
+        if logged_in?
+            erb :'amiibos/amiibos'
+        else
+            redirect to '/login'
+        end
     end
 
 end

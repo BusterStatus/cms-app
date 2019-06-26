@@ -14,7 +14,16 @@
     <link rel="stylesheet" href="/stylesheets/main.css" />
   </head>
   <body>
+
     <div class="wrapper">
+
+    <div align="right">
+    <% if logged_in? %>
+      <form action="/logout" method="post">
+      <input type="submit" name="logout" value="Logout">
+      </form>
+    <% end %>
+    </div>
 
         <%= yield %>
 
