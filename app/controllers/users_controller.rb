@@ -14,9 +14,9 @@ class UsersController < ApplicationController
 
     post '/signup' do
         if params[:password] == params[:password_confirmation] && params[:email] == params[:email_confirmation]
-            user = User.create(name: params[:name], email: params[:email], password: params[:password], password_confirmation: params[:password_confirmation])
+            user = User.create(name: params[:name], username: params[:username].downcase, email: params[:email].downcase, password: params[:password], password_confirmation: params[:password_confirmation])
             session[:user_id] = user.id
-            redirect to "/users/#{current_user.slug}"
+            redirect to "/users/#{user.slug}"
         else
             erb :'/users/signup'
         end
@@ -24,6 +24,7 @@ class UsersController < ApplicationController
 
     get '/login' do
         if logged_in?
+
             redirect to "/users/#{current_user.slug}"
         else
           erb :'/users/login'
@@ -33,7 +34,6 @@ class UsersController < ApplicationController
     post '/login' do
         user = User.find_by(:email => params[:email])
         if user.try(:authenticate, params[:password]) 
-            session.clear
             session[:user_id] = user.id
             redirect to "/users/#{current_user.slug}"
         else
@@ -51,8 +51,12 @@ class UsersController < ApplicationController
     end
 
     get '/users/:slug' do
-        @user = User.find_by_slug(params[:slug])
-        erb :'/users/show'
+        if logged_in?
+            @user = User.find_by_slug(params[:slug])
+            erb :'/users/show'
+        else
+            redirect to '/login'
+        end
     end
 
 end
