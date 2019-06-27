@@ -6,25 +6,25 @@ class UsersController < ApplicationController
 
     get '/signup' do
         if logged_in?
-            redirect to '/amiibos'
+            redirect to "/users/#{current_user.slug}"
         else
           erb :'/users/signup'
         end
     end
 
     post '/signup' do
-        # if params[:password] == params[:confirm_password]
-            user = User.create(name: params[:name], email: params[:email], password: params[:password], password_confirmation: params[:confirm_password])
+        if params[:password] == params[:password_confirmation] && params[:email] == params[:email_confirmation]
+            user = User.create(name: params[:name], email: params[:email], password: params[:password], password_confirmation: params[:password_confirmation])
             session[:user_id] = user.id
-            redirect to '/amiibos'
-        # else
-        #     erb :'/users/signup'
-        # end
+            redirect to "/users/#{current_user.slug}"
+        else
+            erb :'/users/signup'
+        end
     end
 
     get '/login' do
         if logged_in?
-            redirect to '/amiibos'
+            redirect to "/users/#{current_user.slug}"
         else
           erb :'/users/login'
         end
@@ -35,7 +35,7 @@ class UsersController < ApplicationController
         if user.try(:authenticate, params[:password]) 
             session.clear
             session[:user_id] = user.id
-            redirect "/amiibos"
+            redirect to "/users/#{current_user.slug}"
         else
           redirect "/login"
         end
@@ -52,7 +52,6 @@ class UsersController < ApplicationController
 
     get '/users/:slug' do
         @user = User.find_by_slug(params[:slug])
-        @amiibos = Tweet.all
         erb :'/users/show'
     end
 
